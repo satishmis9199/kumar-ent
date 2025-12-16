@@ -5,44 +5,30 @@ import java.sql.DriverManager;
 
 public class DBConnection {
 
-    private static Connection connection;
-
     static {
         try {
-            // ✅ MySQL Driver load
             Class.forName("com.mysql.cj.jdbc.Driver");
-            System.out.println("✅ MySQL Driver Loaded Successfully");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("❌ MySQL Driver NOT FOUND", e);
+            System.out.println("✅ MySQL Driver Loaded");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
     public static Connection getConnection() {
-        if (connection != null) {
-            return connection;
-        }
-
         try {
-            // ✅ Railway environment variables
-            String host = System.getenv("MYSQLHOST");
-            String port = System.getenv("MYSQLPORT");
-            String db   = System.getenv("MYSQLDATABASE");
-            String user = System.getenv("MYSQLUSER");
-            String pass = System.getenv("MYSQLPASSWORD");
+            String url = System.getenv("MYSQL_URL");
 
-            String url = "jdbc:mysql://" + host + ":" + port + "/" + db
-                    + "?useSSL=false"
-                    + "&allowPublicKeyRetrieval=true"
-                    + "&serverTimezone=UTC";
+            if (url == null) {
+                throw new RuntimeException("❌ MYSQL_URL not found");
+            }
 
-            connection = DriverManager.getConnection(url, user, pass);
+            Connection con = DriverManager.getConnection(url);
             System.out.println("✅ Connected to Railway MySQL");
+            return con;
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Avi Database connection nahi hua hai....Final working after 7PM Today.");
+            throw new RuntimeException("❌ Database connection failed");
         }
-
-        return connection;
     }
 }
