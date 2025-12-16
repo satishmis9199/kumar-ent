@@ -2,18 +2,14 @@ package com.kumarent.util;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 
 public class DBConnection {
 
-    private static final String URL =
-            "jdbc:mysql://localhost:3306/kumar_ent?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-    private static final String USER = "root";
-    private static final String PASS = "satish";
+    private static Connection connection;
 
     static {
         try {
-            // 🔥 FORCE driver load
+            // ✅ MySQL Driver load
             Class.forName("com.mysql.cj.jdbc.Driver");
             System.out.println("✅ MySQL Driver Loaded Successfully");
         } catch (ClassNotFoundException e) {
@@ -21,7 +17,32 @@ public class DBConnection {
         }
     }
 
-    public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASS);
+    public static Connection getConnection() {
+        if (connection != null) {
+            return connection;
+        }
+
+        try {
+            // ✅ Railway environment variables
+            String host = System.getenv("MYSQLHOST");
+            String port = System.getenv("MYSQLPORT");
+            String db   = System.getenv("MYSQLDATABASE");
+            String user = System.getenv("MYSQLUSER");
+            String pass = System.getenv("MYSQLPASSWORD");
+
+            String url = "jdbc:mysql://" + host + ":" + port + "/" + db
+                    + "?useSSL=false"
+                    + "&allowPublicKeyRetrieval=true"
+                    + "&serverTimezone=UTC";
+
+            connection = DriverManager.getConnection(url, user, pass);
+            System.out.println("✅ Connected to Railway MySQL");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("❌ Database connection failed");
+        }
+
+        return connection;
     }
 }
