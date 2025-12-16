@@ -29,7 +29,7 @@ public class AdminLoginServlet extends HttpServlet {
                 HttpSession session = req.getSession();
                 session.setAttribute("adminUser", user);
                 System.out.println("Admin with username has succcessfully loged in "+user+req.getSession());
-                resp.sendRedirect(req.getContextPath() + "/admin/dashboard.jsp");
+                resp.sendRedirect(req.getContextPath() + "/admin/dashboard");
             } else {
             	System.out.println("Invalid Ceredentials");
                 req.setAttribute("error", "Invalid credentials");

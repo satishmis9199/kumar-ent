@@ -30,7 +30,7 @@
 <div class="container py-4" style="max-width:760px;">
 
   <!-- Back Button -->
-  <a href="<%= request.getContextPath() %>/admin/dashboard.jsp" class="btn btn-outline-secondary btn-sm mb-3">← Back to Dashboard</a>
+  <a href="<%= request.getContextPath() %>/admin/dashboard" class="btn btn-outline-secondary btn-sm mb-3">← Back to Dashboard</a>
 
   <div class="form-card">
 

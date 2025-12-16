@@ -84,11 +84,11 @@
   </p>
   <p>Order ID: <strong><%= request.getAttribute("orderUid") %></strong></p>
 
-<a class="btn btn-success"
-   href="<%= request.getContextPath() + request.getAttribute("invoicePath") %>"
-   target="_blank">
-   Download Invoice
+<a href="invoicePdf?orderUid=<%= request.getAttribute("orderUid") %>"
+   class="btn btn-success mt-3">
+    📄 Download Invoice
 </a>
+
   
 
   <div class="d-grid gap-2">

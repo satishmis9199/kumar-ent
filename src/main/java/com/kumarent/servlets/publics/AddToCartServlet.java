@@ -35,7 +35,7 @@ public class AddToCartServlet extends HttpServlet {
             if(found) {
             	System.out.println("added in a cart");
             }
-            resp.sendRedirect("cart.jsp");
+            resp.sendRedirect("shop.jsp");
         } catch (Exception e) {
             throw new ServletException(e);
         }

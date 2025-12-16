@@ -58,6 +58,86 @@ public class OrderDAO {
             }
         }
     }
+    
+    
+    
+    
+    
+    
+    public static int countAllOrders() throws Exception {
+        String sql = "SELECT COUNT(*) FROM orders";
+        try (Connection c = DBConnection.getConnection();
+             PreparedStatement pst = c.prepareStatement(sql);
+             ResultSet rs = pst.executeQuery()) {
+            rs.next();
+            return rs.getInt(1);
+        }
+    }
+
+    public static int countByStatus(String status) throws Exception {
+        String sql = "SELECT COUNT(*) FROM orders WHERE status = ?";
+        try (Connection c = DBConnection.getConnection();
+             PreparedStatement pst = c.prepareStatement(sql)) {
+            pst.setString(1, status);
+            try (ResultSet rs = pst.executeQuery()) {
+                rs.next();
+                return rs.getInt(1);
+            }
+        }
+    }
+    
+    
+    public static int countOrdersBetween(java.sql.Date from, java.sql.Date to) throws Exception {
+        String sql = "SELECT COUNT(*) FROM orders WHERE DATE(created_at) BETWEEN ? AND ?";
+        try (Connection c = DBConnection.getConnection();
+             PreparedStatement pst = c.prepareStatement(sql)) {
+
+            pst.setDate(1, from);
+            pst.setDate(2, to);
+
+            try (ResultSet rs = pst.executeQuery()) {
+                rs.next();
+                return rs.getInt(1);
+            }
+        }
+    }
+
+    public static double revenueBetween(java.sql.Date from, java.sql.Date to) throws Exception {
+        String sql = "SELECT IFNULL(SUM(total_amount),0) FROM orders WHERE status='Delivered' AND DATE(created_at) BETWEEN ? AND ?";
+
+        try (Connection c = DBConnection.getConnection();
+             PreparedStatement pst = c.prepareStatement(sql)) {
+
+            pst.setDate(1, from);
+            pst.setDate(2, to);
+
+            try (ResultSet rs = pst.executeQuery()) {
+                rs.next();
+                return rs.getDouble(1);
+            }
+        }
+    }
+
+    
+    
+    
+
+    public static double totalRevenue() throws Exception {
+        String sql = "SELECT IFNULL(SUM(total_amount),0) FROM orders WHERE status='Delivered'";
+        try (Connection c = DBConnection.getConnection();
+             PreparedStatement pst = c.prepareStatement(sql);
+             ResultSet rs = pst.executeQuery()) {
+            rs.next();
+            return rs.getDouble(1);
+        }
+    }
+
+    
+    
+    
+    
+    
+    
 
     public static Order findByOrderUid(String uid) throws Exception {
         String sql = "SELECT * FROM orders WHERE order_uid = ?";

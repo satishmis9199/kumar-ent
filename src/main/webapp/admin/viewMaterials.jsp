@@ -4,123 +4,189 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Materials</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Materials | Admin</title>
 
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
   <style>
-    :root {
-      --card-bg: #ffffff;
-      --page-bg: #f6f8fb;
-      --muted: #6b7280;
+    body {
+      background: linear-gradient(135deg, #eef2ff, #f8fafc);
+      font-family: system-ui, -apple-system, 'Segoe UI';
+      color: #111827;
     }
-    body { background: var(--page-bg); font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial; color: #111827; }
-    .panel {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 18px;
-      box-shadow: 0 8px 24px rgba(2,6,23,0.06);
+
+    .glass-panel {
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 25px 55px rgba(0,0,0,0.1);
     }
-    .table thead th { border-bottom: 0; background: #f3f6fb; }
-    .thumb { width:64px; height:44px; object-fit:cover; border-radius:6px; border:1px solid #eef2f7; }
-    .muted-small { color: var(--muted); font-size: .95rem; }
-    .action-btns .btn { margin-right:6px; }
-    .no-data { padding:30px 0; color:var(--muted); text-align:center; }
-    .title-row { gap: 0.75rem; align-items:center; }
-    @media (max-width: 768px) {
-      .title-row { flex-direction:column; align-items:stretch; gap:.5rem; }
-      .action-btns { display:flex; gap:.5rem; justify-content:flex-end; }
+
+    .page-title {
+      font-weight: 800;
+      letter-spacing: .3px;
+    }
+
+    table thead th {
+      background: #111827;
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      font-size: .85rem;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    table td {
+      vertical-align: middle;
+    }
+
+    .thumb {
+      width: 70px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .stock-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: .75rem;
+      font-weight: 700;
+      display: inline-block;
+    }
+
+    .stock-low { background:#fee2e2; color:#991b1b; }
+    .stock-ok { background:#dcfce7; color:#166534; }
+
+    .action-btns .btn {
+      margin-right: 4px;
     }
   </style>
 </head>
+
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg bg-white shadow-sm mb-4">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="#">Kumar Ent - Admin</a>
-    <div class="ms-auto d-none d-md-block">
-      <a class="btn btn-outline-secondary btn-sm" href="<%= request.getContextPath() %>/admin/dashboard.jsp">Dashboard</a>
-    </div>
+    <span class="navbar-brand fw-bold">Kumar Ent – Admin Panel</span>
+    <a href="<%= request.getContextPath() %>/admin/dashboard"
+       class="btn btn-outline-dark btn-sm">
+      <i class="bi bi-speedometer2"></i> Dashboard
+    </a>
   </div>
 </nav>
 
-<div class="container" style="max-width:1100px;">
-  <div class="panel">
+<!-- MAIN -->
+<div class="container" style="max-width:1200px;">
+  <div class="glass-panel">
 
-    <div class="d-flex justify-content-between align-items-center mb-3 title-row">
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
       <div>
-        <h5 class="mb-0">Materials</h5>
-        <div class="muted-small">Manage catalog items</div>
+        <h3 class="page-title mb-0">Materials</h3>
+        <small class="text-muted">Manage product catalog & inventory</small>
       </div>
 
-      <div class="action-btns d-flex align-items-center">
-        <a class="btn btn-success btn-sm" href="<%= request.getContextPath() %>/admin/addMaterial.jsp">+ Add Material</a>
-      </div>
+      <a href="<%= request.getContextPath() %>/admin/addMaterial.jsp"
+         class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Add Material
+      </a>
     </div>
 
+    <!-- TABLE -->
     <div class="table-responsive">
-      <table class="table align-middle table-hover">
-        <thead class="table-light">
+      <table class="table table-hover align-middle">
+        <thead>
           <tr>
-            <th style="width:6%">#</th>
-            <th style="width:8%">Thumb</th>
-            <th>Name</th>
-            <th style="width:12%">Price</th>
-            <th style="width:10%">Qty</th>
-            <th style="width:18%">Actions</th>
+            <th>#</th>
+            <th>Image</th>
+            <th>Material</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th class="text-center">Actions</th>
           </tr>
         </thead>
 
         <tbody>
         <%
           try {
-              java.util.List<Material> list = MaterialDAO.listAll();
-
-              if (list == null || list.isEmpty()) {
-        %>
-                <tr>
-                  <td colspan="6" class="no-data">
-                    No materials found. <a href="<%= request.getContextPath() %>/admin/addMaterial.jsp" class="fw-semibold">Add a material</a>
-                  </td>
-                </tr>
-        <%
-              } else {
-                int idx = 1;
-                for (Material m : list) {
-                  String img = (m.getImagePath() == null || m.getImagePath().trim().isEmpty())
-                               ? "https://via.placeholder.com/300x200?text=No+Image" : m.getImagePath();
+            java.util.List<Material> list = MaterialDAO.listAll();
+            if (list == null || list.isEmpty()) {
         %>
           <tr>
-            <td><%= idx++ %></td>
-            <td>
-              <img src="<%= img %>" alt="thumb" class="thumb">
+            <td colspan="6" class="text-center text-muted py-4">
+              <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+              No materials found
             </td>
+          </tr>
+        <%
+            } else {
+              int i = 1;
+              for (Material m : list) {
+                String img = (m.getImagePath() == null || m.getImagePath().isBlank())
+                             ? "https://via.placeholder.com/300x200?text=No+Image"
+                             : m.getImagePath();
+                boolean lowStock = m.getQuantity() < 10;
+        %>
+          <tr>
+            <td class="fw-semibold"><%= i++ %></td>
+
+            <td>
+              <img src="<%= img %>" class="thumb" alt="material">
+            </td>
+
             <td>
               <div class="fw-semibold"><%= m.getName() %></div>
-              <div class="muted-small">ID: <%= m.getId() %></div>
+              <div class="text-muted small">ID: <%= m.getId() %></div>
             </td>
-            <td class="fw-semibold">₹ <%= String.format("%.2f", m.getPrice()) %></td>
-            <td><%= m.getQuantity() %></td>
-            <td>
-              <a class="btn btn-sm btn-primary" href="<%= request.getContextPath() %>/admin/editMaterial.jsp?id=<%= m.getId() %>">Edit</a>
 
-              <form action="<%= request.getContextPath() %>/admin/deleteMaterial" method="post" style="display:inline;">
-                <input type="hidden" name="id" value="<%= m.getId() %>" />
-                <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+            <td class="fw-bold">₹ <%= String.format("%.2f", m.getPrice()) %></td>
+
+            <td>
+              <span class="stock-pill <%= lowStock ? "stock-low" : "stock-ok" %>">
+                <%= lowStock ? "Low Stock" : "In Stock" %> ( <%= m.getQuantity() %> )
+              </span>
+            </td>
+
+            <td class="text-center action-btns">
+              <a class="btn btn-sm btn-outline-primary"
+                 href="<%= request.getContextPath() %>/admin/editMaterial.jsp?id=<%= m.getId() %>">
+                <i class="bi bi-pencil"></i>
+              </a>
+
+              <form action="<%= request.getContextPath() %>/admin/deleteMaterial"
+                    method="post"
+                    style="display:inline;"
+                    onsubmit="return confirm('Are you sure you want to delete this material?');">
+                <input type="hidden" name="id" value="<%= m.getId() %>">
+                <button class="btn btn-sm btn-outline-danger" type="submit">
+                  <i class="bi bi-trash"></i>
+                </button>
               </form>
             </td>
           </tr>
         <%
-                } // end for
-              } // end else
+              }
+            }
           } catch (Exception e) {
-              out.println("<tr><td colspan='6' class='text-danger'>Error: " + e.getMessage() + "</td></tr>");
-          }
         %>
+          <tr>
+            <td colspan="6" class="text-danger text-center">
+              Error loading materials
+            </td>
+          </tr>
+        <% } %>
         </tbody>
+
       </table>
     </div>
 
@@ -129,4 +195,3 @@
 
 </body>
 </html>
-F
