@@ -40,7 +40,7 @@ public class DBConnection {
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("❌ Database connection failed");
+            throw new RuntimeException("Avi Database connection nahi hua hai....Final working after 7PM Today.");
         }
 
         return connection;
