@@ -1,20 +1,18 @@
 package com.kumarent.util;
 
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-
-import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.io.entity.StringEntity;
 
 public class EmailUtil {
 
     private static final String API_URL =
             "https://api.brevo.com/v3/smtp/email";
 
-    private static final String API_KEY =
-            "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";
+    // 🔐 Read from Railway → Variables
+    private static final String API_KEY ="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";
 
     private static final String FROM_EMAIL =
             "satishmis9199@gmail.com";
@@ -30,30 +28,24 @@ public class EmailUtil {
             String subject,
             String body) throws Exception {
 
-        String json = String.format(
+        String json =
                 "{"
               + "\"sender\":{"
-              +     "\"name\":\"%s\","
-              +     "\"email\":\"%s\""
+              +     "\"name\":\"" + FROM_NAME + "\","
+              +     "\"email\":\"" + FROM_EMAIL + "\""
               + "},"
               + "\"to\":[{"
-              +     "\"email\":\"%s\""
+              +     "\"email\":\"" + toEmail + "\""
               + "}],"
-              + "\"subject\":\"%s\","
-              + "\"htmlContent\":\"%s\""
-              + "}",
-                FROM_NAME,
-                FROM_EMAIL,
-                toEmail,
-                subject,
-                body
-        );
+              + "\"subject\":\"" + escape(subject) + "\","
+              + "\"htmlContent\":\"" + escape(body) + "\""
+              + "}";
 
         send(json);
     }
 
     // ===============================
-    // EMAIL WITH PDF
+    // EMAIL WITH PDF ATTACHMENT
     // ===============================
     public static void sendEmailWithPdfBytes(
             String toEmail,
@@ -65,47 +57,69 @@ public class EmailUtil {
         String pdfBase64 = Base64.getEncoder()
                 .encodeToString(pdfData);
 
-        String json = String.format(
+        String json =
                 "{"
               + "\"sender\":{"
-              +     "\"name\":\"%s\","
-              +     "\"email\":\"%s\""
+              +     "\"name\":\"" + FROM_NAME + "\","
+              +     "\"email\":\"" + FROM_EMAIL + "\""
               + "},"
               + "\"to\":[{"
-              +     "\"email\":\"%s\""
+              +     "\"email\":\"" + toEmail + "\""
               + "}],"
-              + "\"subject\":\"%s\","
-              + "\"htmlContent\":\"%s\","
+              + "\"subject\":\"" + escape(subject) + "\","
+              + "\"htmlContent\":\"" + escape(body) + "\","
               + "\"attachment\":[{"
-              +     "\"content\":\"%s\","
-              +     "\"name\":\"%s\""
+              +     "\"content\":\"" + pdfBase64 + "\","
+              +     "\"name\":\"" + fileName + "\""
               + "}]"
-              + "}",
-                FROM_NAME,
-                FROM_EMAIL,
-                toEmail,
-                subject,
-                body,
-                pdfBase64,
-                fileName
-        );
+              + "}";
 
         send(json);
     }
 
     // ===============================
-    // HTTP CALL
+    // HTTP CALL USING CORE JAVA
     // ===============================
     private static void send(String json) throws Exception {
 
-        HttpPost post = new HttpPost(API_URL);
-        post.setHeader("api-key", API_KEY);
-        post.setHeader("Content-Type", "application/json");
-        post.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON));
-
-        try (CloseableHttpClient client = HttpClients.createDefault()) {
-            client.execute(post);
+        if (API_KEY == null || API_KEY.isEmpty()) {
+            throw new IllegalStateException("BREVO_API_KEY not set");
         }
+
+        URL url = new URL(API_URL);
+        HttpURLConnection conn =
+                (HttpURLConnection) url.openConnection();
+
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        conn.setRequestProperty("api-key", API_KEY);
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setRequestProperty("Accept", "application/json");
+
+        byte[] input =
+                json.getBytes(StandardCharsets.UTF_8);
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(input);
+        }
+
+        int responseCode = conn.getResponseCode();
+
+        if (responseCode != 201 && responseCode != 200) {
+            throw new RuntimeException(
+                    "Email failed. HTTP Code: " + responseCode);
+        }
+
+        conn.disconnect();
+    }
+
+    // ===============================
+    // JSON SAFE ESCAPE
+    // ===============================
+    private static String escape(String text) {
+        return text == null ? "" : text
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "<br/>");
     }
 }
-
