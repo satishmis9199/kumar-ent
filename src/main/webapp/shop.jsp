@@ -22,13 +22,11 @@
       font-family: "Segoe UI", system-ui, sans-serif;
     }
 
-    /* Navbar */
     .navbar {
       background: #ffffff;
       box-shadow: 0 4px 20px rgba(0,0,0,.05);
     }
 
-    /* Card */
     .product-card {
       border: none;
       border-radius: 16px;
@@ -78,7 +76,6 @@
       color: #dc3545;
     }
 
-    /* Filters */
     .filter-box {
       background: #ffffff;
       padding: 20px;
@@ -86,7 +83,6 @@
       box-shadow: 0 6px 18px rgba(0,0,0,.05);
     }
 
-    /* Footer */
     .footer {
       background: #ffffff;
       box-shadow: 0 -4px 18px rgba(0,0,0,.05);
@@ -98,15 +94,26 @@
 
 <!-- NAVBAR -->
 <nav class="navbar fixed-top navbar-expand-lg">
-  <div class="container">
-    <a class="navbar-brand fw-bold text-primary" href="#">
+  <div class="container d-flex justify-content-between align-items-center">
+
+    <a class="navbar-brand fw-bold text-primary" href="<%= request.getContextPath() %>/">
       <i class="bi bi-shop-window"></i> Kumar Ent
     </a>
 
-    <a class="btn btn-outline-primary rounded-pill"
-       href="<%=request.getContextPath()%>/cart.jsp">
-      <i class="bi bi-cart3"></i> View Cart
-    </a>
+    <div class="d-flex gap-2">
+
+      <a class="btn btn-outline-primary rounded-pill"
+         href="<%= request.getContextPath() %>/">
+        <i class="bi bi-house-door"></i> Main Page
+      </a>
+
+
+      <a class="btn btn-outline-primary rounded-pill"
+         href="<%= request.getContextPath() %>/cart.jsp">
+        <i class="bi bi-cart3"></i> Cart
+      </a>
+
+    </div>
   </div>
 </nav>
 
@@ -128,7 +135,6 @@
 
 <div class="container">
 
-  <!-- TITLE -->
   <div class="mb-4 text-center">
     <h2 class="fw-bold">Shop Materials</h2>
     <p class="text-muted">Quality products at the best prices</p>
@@ -164,9 +170,7 @@
     </div>
 
     <div class="col-md-2 d-grid">
-      <button class="btn btn-primary rounded-pill">
-        Apply
-      </button>
+      <button class="btn btn-primary rounded-pill">Apply</button>
     </div>
   </form>
 
@@ -197,7 +201,6 @@
         <div class="img-box">
           <img src="<%= m.getImagePath() == null ?
             "https://via.placeholder.com/400x200" : m.getImagePath() %>">
-
           <span class="badge-price">₹ <%= m.getPrice() %></span>
 
           <% if (m.getQuantity() <= 0) { %>
