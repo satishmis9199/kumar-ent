@@ -108,7 +108,7 @@
 
     <a href="<%= request.getContextPath() %>" 
        class="btn btn-outline-light btn-sm">
-      <i class="bi bi-house-door"></i> Home
+      <i class="bi bi-house-door"></i> Home 
     </a>
 
   </div>
@@ -153,9 +153,16 @@
              required />
     </div>
 
+    <!-- Login Button -->
     <button class="btn btn-primary w-100 mt-2">
       <i class="bi bi-box-arrow-in-right"></i> Login
     </button>
+
+    <!-- Back to Dashboard Button -->
+    <a href="<%= request.getContextPath() %>/index.jsp"
+       class="btn btn-outline-secondary w-100 mt-3">
+      <i class="bi bi-speedometer2"></i> Back to Dashboard
+    </a>
 
     <footer>
       © <%= java.time.Year.now() %> Kumar Enterprises — Admin Panel
