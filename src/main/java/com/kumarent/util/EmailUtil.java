@@ -12,7 +12,9 @@ public class EmailUtil {
             "https://api.brevo.com/v3/smtp/email";
 
     // 🔐 Read from Railway → Variables
-    private static final String API_KEY ="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";
+    private static final String API_KEY =
+        System.getenv("BREVO_API_KEY");
+
 
     private static final String FROM_EMAIL =
             "satishmis9199@gmail.com";
