@@ -66,6 +66,55 @@ public class MaterialDAO {
         return list;
     }
 
+    
+    
+    public static void upsertMaterial(
+            String name,
+            String description,
+            double price,
+            int quantity,
+            String imagePath) throws Exception {
+
+        String checkSql = "SELECT id FROM material WHERE name = ?";
+        String insertSql =
+            "INSERT INTO material (name, description, price, quantity, image_path) " +
+            "VALUES (?, ?, ?, ?, ?)";
+
+        String updateSql =
+            "UPDATE material SET description=?, price=?, quantity=?, image_path=? " +
+            "WHERE name=?";
+
+        try (Connection con = DBConnection.getConnection()) {
+
+            // Check existing
+            PreparedStatement psCheck = con.prepareStatement(checkSql);
+            psCheck.setString(1, name);
+            ResultSet rs = psCheck.executeQuery();
+
+            if (rs.next()) {
+                // 🔁 UPDATE
+                PreparedStatement psUpdate = con.prepareStatement(updateSql);
+                psUpdate.setString(1, description);
+                psUpdate.setDouble(2, price);
+                psUpdate.setInt(3, quantity);
+                psUpdate.setString(4, imagePath);
+                psUpdate.setString(5, name);
+                psUpdate.executeUpdate();
+
+            } else {
+                // ➕ INSERT
+                PreparedStatement psInsert = con.prepareStatement(insertSql);
+                psInsert.setString(1, name);
+                psInsert.setString(2, description);
+                psInsert.setDouble(3, price);
+                psInsert.setInt(4, quantity);
+                psInsert.setString(5, imagePath);
+                psInsert.executeUpdate();
+            }
+        }
+    }
+
+    
     /* ================= FIND BY ID ================= */
     public static Material findById(int id) throws Exception {
         String sql = "SELECT * FROM material WHERE id = ?";
