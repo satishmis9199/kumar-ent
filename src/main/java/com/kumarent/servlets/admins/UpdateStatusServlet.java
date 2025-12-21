@@ -19,14 +19,14 @@ public class UpdateStatusServlet extends HttpServlet {
         String uid = req.getParameter("uid");
         if (uid == null || uid.trim().isEmpty()) {
             req.getSession().setAttribute("error", "Missing order id");
-            resp.sendRedirect(req.getContextPath() + "/admin/viewOrders.jsp");
+            resp.sendRedirect(req.getContextPath() + "/admin/updateStatus.jsp");
             return;
         }
         try {
             Order o = OrderDAO.findByOrderUid(uid.trim());
             if (o == null) {
                 req.getSession().setAttribute("error", "Order not found: " + uid);
-                resp.sendRedirect(req.getContextPath() + "/admin/viewOrders.jsp");
+                resp.sendRedirect(req.getContextPath() + "/admin/updateStatus.jsp");
                 return;
             }
             req.setAttribute("order", o);
@@ -44,7 +44,7 @@ public class UpdateStatusServlet extends HttpServlet {
 
         if (uid == null || uid.trim().isEmpty() || newStatusSubmitted == null || newStatusSubmitted.trim().isEmpty()) {
             req.getSession().setAttribute("error", "Invalid request");
-            resp.sendRedirect(req.getContextPath() + "/admin/viewOrders.jsp");
+            resp.sendRedirect(req.getContextPath() + "/admin/updateStatus.jsp");
             return;
         }
 
@@ -60,7 +60,7 @@ public class UpdateStatusServlet extends HttpServlet {
             Order currentOrder = OrderDAO.findByOrderUid(uid);
             if (currentOrder == null) {
                 req.getSession().setAttribute("error", "Order not found: " + uid);
-                resp.sendRedirect(req.getContextPath() + "/admin/viewOrders.jsp");
+                resp.sendRedirect(req.getContextPath() + "/admin/updateStatus.jsp");
                 return;
             }
 
@@ -79,7 +79,7 @@ public class UpdateStatusServlet extends HttpServlet {
             int nextIndex = currentIndex + 1;
             if (nextIndex >= keys.length) {
                 req.getSession().setAttribute("error", "Order is already in final status.");
-                resp.sendRedirect(req.getContextPath() + "/admin/viewOrders.jsp");
+                resp.sendRedirect(req.getContextPath() + "/admin/updateStatus.jsp");
                 return;
             }
 
@@ -93,7 +93,7 @@ public class UpdateStatusServlet extends HttpServlet {
 
             if (!(submittedNormalized.equals(expectedKeyNormalized) || submittedNormalized.equals(expectedLabelNormalized))) {
                 req.getSession().setAttribute("error", "Invalid status requested. Allowed next status: " + expectedNextLabel);
-                resp.sendRedirect(req.getContextPath() + "/admin/viewOrders.jsp");
+                resp.sendRedirect(req.getContextPath() + "/admin/updateStatus.jsp");
                 return;
             }
 
@@ -106,7 +106,7 @@ public class UpdateStatusServlet extends HttpServlet {
                         + " current=" + current + " expectedNextKey=" + expectedNextKey
                         + " submitted=" + newStatusSubmitted);
                 req.getSession().setAttribute("error", "Invalid status transition or order not found.");
-                resp.sendRedirect(req.getContextPath() + "/admin/viewOrders.jsp");
+                resp.sendRedirect(req.getContextPath() + "/admin/updateStatus.jsp");
                 return;
             }
 
@@ -133,7 +133,7 @@ public class UpdateStatusServlet extends HttpServlet {
             } catch (Exception ex) { /* ignore */ }
 
             req.getSession().setAttribute("msg", "Status updated to: " + expectedNextLabel);
-            resp.sendRedirect(req.getContextPath() + "/admin/viewOrders.jsp");
+            resp.sendRedirect(req.getContextPath() + "/admin/updateStatus.jsp");
 
         } catch (Exception e) {
             throw new ServletException(e);

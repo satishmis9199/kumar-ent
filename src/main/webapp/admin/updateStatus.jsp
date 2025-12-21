@@ -9,117 +9,186 @@
 
     String current = o.getStatus() == null ? "Pending" : o.getStatus();
 
-    // canonical keys and friendly labels
-    String[] keys = {"Pending","Approved","Packed","OutForDelivery","Delivered"};
+    String[] keys   = {"Pending","Approved","Packed","OutForDelivery","Delivered"};
     String[] labels = {"Pending","Approved","Packed","Out For Delivery","Delivered"};
 
-    int currentIndex = -1;
+    int currentIndex = 0;
     for (int i = 0; i < keys.length; i++) {
         if (keys[i].equalsIgnoreCase(current) || labels[i].equalsIgnoreCase(current)) {
             currentIndex = i;
             break;
         }
     }
-    if (currentIndex < 0) currentIndex = 0;
-
-    int nextIndex = currentIndex + 1;
-    if (nextIndex >= keys.length) nextIndex = -1;
 %>
+
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Update Order Status</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    .stepper { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-    .step { flex:1 1 140px; text-align:center; padding:12px; border-radius:10px; background:#f5f7fa; position:relative; }
-    .step.completed { background:#e6f4ea; color:#0b7a3e; font-weight:600; }
-    .step.current { background:#eef2ff; color:#0d6efd; font-weight:700; box-shadow:0 6px 18px rgba(13,110,253,.08); }
-    .step.upcoming { background:#fff; color:#6c757d; }
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Update Order Status | Admin</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+<style>
+body{
+  background:linear-gradient(135deg,#eef2ff,#f8fafc);
+  font-family:system-ui,-apple-system,"Segoe UI";
+}
+
+.glass-card{
+  background:rgba(255,255,255,.94);
+  backdrop-filter:blur(14px);
+  border-radius:18px;
+  box-shadow:0 30px 60px rgba(0,0,0,.12);
+}
+
+.stepper{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+}
+.step{
+  flex:1 1 150px;
+  padding:14px;
+  border-radius:14px;
+  text-align:center;
+  font-weight:600;
+}
+.step.completed{
+  background:#dcfce7;
+  color:#166534;
+}
+.step.current{
+  background:#e0e7ff;
+  color:#1e40af;
+  box-shadow:0 10px 25px rgba(37,99,235,.15);
+}
+.step.future{
+  background:#f8fafc;
+  color:#6b7280;
+}
+
+.badge-status{
+  padding:6px 14px;
+  border-radius:999px;
+  font-weight:700;
+  background:#0d6efd;
+}
+</style>
 </head>
+
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+
+<!-- NAVBAR -->
+<nav class="navbar bg-white shadow-sm">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="#">Kumar Ent - Admin</a>
-    <div class="ms-auto">
-      <a class="btn btn-outline-secondary btn-sm" href="<%= request.getContextPath() %>/admin/viewOrders.jsp">← Back to Orders</a>
-    </div>
+    <span class="navbar-brand fw-bold">
+      <i class="bi bi-gear-fill"></i> Kumar Ent — Admin
+    </span>
+    <a href="<%=request.getContextPath()%>/admin/viewOrders.jsp"
+       class="btn btn-outline-secondary btn-sm">
+       ← Back to Orders
+    </a>
   </div>
 </nav>
 
-<div class="container py-4">
+<div class="container my-5" style="max-width:820px;">
+
   <% 
     String msg = (String) session.getAttribute("msg");
     String err = (String) session.getAttribute("error");
-    if (msg != null) { %>
-      <div class="alert alert-success"><%= msg %></div>
+    if (msg != null) {
+  %>
+    <div class="alert alert-success"><%=msg%></div>
   <%
       session.removeAttribute("msg");
     }
-    if (err != null) { %>
-      <div class="alert alert-danger"><%= err %></div>
+    if (err != null) {
+  %>
+    <div class="alert alert-danger"><%=err%></div>
   <%
       session.removeAttribute("error");
     }
   %>
 
-  <div class="mb-3">
-    <h4 class="mb-1">Update Status — <small class="text-muted"><%= o.getOrderUid() %></small></h4>
-    <p class="mb-0">Customer: <strong><%= o.getCustomerName() %></strong> | <%= o.getCustomerContact() %></p>
-    <p class="mb-2">Current Status: <span class="badge bg-info text-dark"><%= labels[currentIndex] %></span></p>
-  </div>
+  <div class="glass-card p-4">
 
-  <!-- Stepper -->
-  <div class="stepper mb-4">
-    <% for (int i = 0; i < keys.length; i++) {
-         String cls = "step ";
-         if (i < currentIndex) cls += "completed";
-         else if (i == currentIndex) cls += "current";
-         else cls += "upcoming";
-    %>
-      <div class="<%= cls %>">
-        <div style="font-size:0.95rem;"><%= labels[i] %></div>
+    <!-- HEADER -->
+    <div class="mb-4">
+      <h4 class="fw-bold mb-1">
+        Update Order Status
+      </h4>
+      <div class="text-muted">
+        Order ID: <strong><%=o.getOrderUid()%></strong>
       </div>
-    <% } %>
-  </div>
+      <div class="text-muted">
+        Customer: <strong><%=o.getCustomerName()%></strong> |
+        <%=o.getCustomerContact()%>
+      </div>
+    </div>
 
-  <% if (nextIndex == -1) { %>
-    <div class="alert alert-secondary">This order is already <strong>Delivered</strong>. No further status updates are available.</div>
-  <% } else { %>
+    <!-- STEPPER -->
+    <div class="stepper mb-4">
+      <% for(int i=0;i<keys.length;i++){
+           String cls="step ";
+           if(i<currentIndex) cls+="completed";
+           else if(i==currentIndex) cls+="current";
+           else cls+="future";
+      %>
+        <div class="<%=cls%>">
+          <%=labels[i]%>
+        </div>
+      <% } %>
+    </div>
 
-    <form id="updateForm" method="post" action="<%= request.getContextPath() %>/admin/updateStatus">
-      <input type="hidden" name="orderUid" value="<%= o.getOrderUid() %>" />
+    <!-- FORM -->
+    <form method="post" action="<%=request.getContextPath()%>/admin/updateStatus">
+      <input type="hidden" name="orderUid" value="<%=o.getOrderUid()%>"/>
 
       <div class="mb-3">
-        <label class="form-label">Move order forward to</label>
-        <select name="newStatus" class="form-select" required>
-          <% for (int i = 0; i < keys.length; i++) {
-               boolean disabled = (i <= currentIndex);
-               boolean selected = (i == nextIndex);
+        <label class="form-label fw-semibold">Change Status</label>
+        <select name="newStatus" class="form-select form-select-lg" required>
+          <option disabled selected>-- Select next status --</option>
+          <% for(int i=0;i<keys.length;i++){
+               boolean disabled = (i<=currentIndex);
           %>
-            <option value="<%= keys[i] %>" <%= disabled ? "disabled" : "" %> <%= selected ? "selected" : "" %>>
-              <%= labels[i] %>
+            <option value="<%=keys[i]%>" <%=disabled?"disabled":""%>>
+              <%=labels[i]%>
             </option>
           <% } %>
         </select>
-        <div class="form-text">Previous statuses are disabled — orders can only move forward.</div>
+        <div class="form-text">
+          Previous stages are locked. You can move directly to any future stage.
+        </div>
       </div>
 
       <div class="mb-3">
-        <label class="form-label">Optional Note (internal)</label>
-        <input name="note" class="form-control" placeholder="Add an internal note for this status update (optional)">
+        <label class="form-label fw-semibold">Internal Note (optional)</label>
+        <textarea class="form-control" rows="2"
+          placeholder="Add note for internal tracking only"></textarea>
       </div>
 
-      <button type="submit" class="btn btn-primary">Update Status</button>
+      <div class="d-flex justify-content-end gap-2">
+        <a href="<%=request.getContextPath()%>/admin/viewOrders.jsp"
+           class="btn btn-outline-secondary">
+           Cancel
+        </a>
+        <button class="btn btn-primary btn-lg">
+          <i class="bi bi-check-circle"></i> Update Status
+        </button>
+      </div>
+
     </form>
 
-  <% } %>
-
+  </div>
 </div>
 
-<footer class="text-center py-3 text-muted">Kumar Enterprises © <%= java.time.Year.now() %></footer>
+<footer class="text-center text-muted py-3">
+  Kumar Enterprises © <%=java.time.Year.now()%>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
